@@ -1,0 +1,6 @@
+/**
+ * Place your custom CSS styles here.
+ **/
+.parent-div-locked {
+    border: 3px solid red !important;
+}
