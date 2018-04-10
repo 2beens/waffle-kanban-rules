@@ -1,72 +1,73 @@
-const MAX_CHILD_COUNT_REVIEW = 5;
-const MAX_CHILD_COUNT_IN_PROGRESS = 3;
-const MAX_CHILD_COUNT_SELECTED = 8;
-
-const SUPPRESS_LOGS = false;
-
 chrome.extension.sendMessage({}, function(response) {
-    var readyStateCheckInterval = setInterval(function() {
-        log('Checking for board ready...');
-        if(!isBoardCreated()) {
-            return;
-        }
-        
-        if (document.readyState !== "complete") { 
-            return; 
-        }
-        
-        // This part of the script triggers when page is done loading
-        log('Setting up Kanban Rules...')
-        clearInterval(readyStateCheckInterval);
+    var maxReviewTasks;
+    var maxInProgressTasks;
+    var maxSelectedTasks;
+    var suppressLogs;
+    
+    readOptions(function() {
+        var readyStateCheckInterval = setInterval(function() {
+            log('Checking for board ready...');
+            if(!isBoardCreated()) {
+                return;
+            }
 
-        getBoardBodyColumns(function(columnCtList){
-            log('Board columns taken...');
-            
-            // get columns map
-            var columnsMap = getColumnsMap(columnCtList);
-            
-            // setup observers - observe cards/tasks being added or removed
-            //      REVIEW COLUMN OBSERVER
-            var reviewColumn = columnsMap['review'];
-            var reviewColumnObserver = new MutationObserver(function(mutationsList, observer) {
-                var cards = reviewColumn.getElementsByClassName('card');
-                if(cards.length >= MAX_CHILD_COUNT_REVIEW) {
-                    reviewColumn.classList.add('parent-div-locked');
-                } else {
-                    reviewColumn.classList.remove('parent-div-locked');
-                }
+            if (document.readyState !== "complete") { 
+                return; 
+            }
+
+            // This part of the script triggers when page is done loading
+            log('Setting up Kanban Rules...')
+            clearInterval(readyStateCheckInterval);
+
+            getBoardBodyColumns(function(columnCtList){
+                log('Board columns taken...');
+
+                // get columns map
+                var columnsMap = getColumnsMap(columnCtList);
+
+                // setup observers - observe cards/tasks being added or removed
+                //      REVIEW COLUMN OBSERVER
+                var reviewColumn = columnsMap['review'];
+                var reviewColumnObserver = new MutationObserver(function(mutationsList, observer) {
+                    var cards = reviewColumn.getElementsByClassName('card');
+                    if(cards.length >= maxReviewTasks) {
+                        reviewColumn.classList.add('parent-div-locked');
+                    } else {
+                        reviewColumn.classList.remove('parent-div-locked');
+                    }
+                });
+                reviewColumnObserver.observe(reviewColumn, { attributes: false, childList: true });
+
+                //      IN PROGRESS COLUMN OBSERVER
+                var inProgressColumn = columnsMap['inProgress'];
+                var inProgressColumnObserver = new MutationObserver(function(mutationsList, observer) {
+                    var cards = inProgressColumn.getElementsByClassName('card');
+                    if(cards.length >= maxInProgressTasks) {
+                        inProgressColumn.classList.add('parent-div-locked');
+                    } else {
+                        inProgressColumn.classList.remove('parent-div-locked');
+                    }
+                });
+                inProgressColumnObserver.observe(inProgressColumn, { attributes: false, childList: true });
+
+                //      SELECTED COLUMN OBSERVER
+                var selectedColumn = columnsMap['selected'];
+                var selectedColumnObserver = new MutationObserver(function(mutationsList, observer) {
+                    var cards = selectedColumn.getElementsByClassName('card');
+                    if(cards.length >= maxSelectedTasks) {
+                        selectedColumn.classList.add('parent-div-locked');
+                    } else {
+                        selectedColumn.classList.remove('parent-div-locked');
+                    }
+                });
+                selectedColumnObserver.observe(selectedColumn, { attributes: false, childList: true });
+
+                log('Observers set up.')
             });
-            reviewColumnObserver.observe(reviewColumn, { attributes: false, childList: true });
-            
-            //      IN PROGRESS COLUMN OBSERVER
-            var inProgressColumn = columnsMap['inProgress'];
-            var inProgressColumnObserver = new MutationObserver(function(mutationsList, observer) {
-                var cards = inProgressColumn.getElementsByClassName('card');
-                if(cards.length >= MAX_CHILD_COUNT_IN_PROGRESS) {
-                    inProgressColumn.classList.add('parent-div-locked');
-                } else {
-                    inProgressColumn.classList.remove('parent-div-locked');
-                }
-            });
-            inProgressColumnObserver.observe(inProgressColumn, { attributes: false, childList: true });
-            
-            //      SELECTED COLUMN OBSERVER
-            var selectedColumn = columnsMap['selected'];
-            var selectedColumnObserver = new MutationObserver(function(mutationsList, observer) {
-                var cards = selectedColumn.getElementsByClassName('card');
-                if(cards.length >= MAX_CHILD_COUNT_SELECTED) {
-                    selectedColumn.classList.add('parent-div-locked');
-                } else {
-                    selectedColumn.classList.remove('parent-div-locked');
-                }
-            });
-            selectedColumnObserver.observe(selectedColumn, { attributes: false, childList: true });
-            
-            log('Observers set up.')
-        });
-        
-        log('Kanban Rules Extension loaded successfully!');
-    }, 500);
+
+            log('Kanban Rules Extension loaded successfully!');
+        }, 500);
+    });
 
     function getChildDivsCount(parentDiv) {
         var childCount = 0;
@@ -142,8 +143,26 @@ chrome.extension.sendMessage({}, function(response) {
         return columnsMap;
     }
     
+    function readOptions(callback) {
+        // Use default values if not found in the storage
+        chrome.storage.sync.get({
+            reviewCap: 5,
+            inProgressCap: 3,
+            selectedCap: 8,
+            suppressLogs: false
+        }, function(items) {
+            maxReviewTasks = items.reviewCap;
+            maxSelectedTasks = items.selectedCap;
+            maxInProgressTasks = items.inProgressCap;
+            suppressLogs = items.suppressLogs;
+            
+            log('Options have been read');
+            callback();
+        });
+    }
+    
     function log(message) {
-        if(SUPPRESS_LOGS) {
+        if(suppressLogs) {
             return;
         }
         
@@ -151,7 +170,7 @@ chrome.extension.sendMessage({}, function(response) {
     }
     
     function error(message) {
-        if(SUPPRESS_LOGS) {
+        if(suppressLogs) {
             return;
         }
         

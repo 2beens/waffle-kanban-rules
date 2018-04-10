@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kanban Rules for Waffle.io Options</title>
+    <link rel="stylesheet" href="css/options.css">
+</head>
+<body>
+    <div class="main-content">
+        <div>
+            <h2 align="center">Kanban Rules for Waffle.io Options</h2>
+            
+            <h4>Max number of tickets for:</h4>
+
+            <label for="review-cap">Review</label>
+            <input type="text" name="review-cap" id="review-cap" value=""><br>
+
+            <label for="selected-cap">Selected</label>
+            <input type="text" name="selected-cap" id="selected-cap" value=""><br>
+
+            <label for="in-progress-cap">In Progress</label>
+            <input type="text" name="in-progress-cap" id="in-progress-cap" value=""><br>
+        </div>
+        
+        <div style="margin-top: 10px; margin-bottom: 10px;">
+            <input type="checkbox" id="suppress-logs"> Suppress Logs          
+        </div>
+
+        <div>
+            <button id="save">Save</button>
+            <div id="status-box"></div>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>
