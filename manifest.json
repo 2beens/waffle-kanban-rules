@@ -10,12 +10,12 @@
   },
   "options_page": "src/options/options.html",
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://www.google.com/*",
         "http://localhost/*",
         "https://localhost/*",
         "https://waffle.io/*"  
@@ -26,7 +26,6 @@
     },
     {
       "matches": [
-        "https://www.google.com/*",
         "http://localhost/*",
         "https://localhost/*",
         "https://waffle.io/*"

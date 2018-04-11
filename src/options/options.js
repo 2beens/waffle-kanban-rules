@@ -17,6 +17,21 @@ function saveOptions() {
         suppressLogs: suppressLogsInput
     }, function() {
         showStatus('Options saved', 2000, false);
+        
+        chrome.tabs.query({active: false, currentWindow: false}, function(tabs) {
+            var waffleTabId = null;
+            for(var tab of tabs) {
+                if(tab.title.toLowerCase().includes('waffle.io')) {
+                    waffleTabId = tab.id;
+                    break;
+                }
+            }
+            
+            // notify any open waffle.io tabs (TODO: for some reason, open tabs do not receive any message...)
+            chrome.tabs.sendMessage(waffleTabId, {greeting: "hello"}, function(response) {
+                console.log(JSON.stringify(response));
+            });
+        });
     });
 }
 
