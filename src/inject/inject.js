@@ -23,6 +23,8 @@ readOptions(function() {
 
             // get columns map
             var columnsMap = getColumnsMap(columnCtList);
+            
+            initialColumnsCheck(columnsMap);
 
             // setup observers - observe cards/tasks being added or removed
             //      REVIEW COLUMN OBSERVER
@@ -72,6 +74,24 @@ readOptions(function() {
         });
     }, 500);
 });
+
+function initialColumnsCheck(columnsMap) {
+    var reviewColumn = columnsMap['review'];
+    var selectedColumn = columnsMap['selected'];
+    var inProgressColumn = columnsMap['inProgress'];
+    checkColumn(reviewColumn, maxReviewTasks);
+    checkColumn(selectedColumn, maxSelectedTasks);
+    checkColumn(inProgressColumn, maxInProgressTasks);
+}
+
+function checkColumn(column, maxTasksNumber) {
+    var cards = column.getElementsByClassName('card');
+    if(cards.length >= maxTasksNumber) {
+        column.classList.add('parent-div-locked');
+    } else {
+        column.classList.remove('parent-div-locked');
+    }
+}
 
 function getChildDivsCount(parentDiv) {
     var childCount = 0;
