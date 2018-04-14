@@ -70,17 +70,22 @@ function initialColumnsCheck(columnsMap) {
     var reviewColumn = columnsMap['review'];
     var selectedColumn = columnsMap['selected'];
     var inProgressColumn = columnsMap['inProgress'];
-    checkColumn(reviewColumn, maxReviewTasks);
-    checkColumn(selectedColumn, maxSelectedTasks);
-    checkColumn(inProgressColumn, maxInProgressTasks);
+    var reviewColumnCardCount = columnsMap['review-card-counter'];
+    var selectedColumnCardCount = columnsMap['selected-card-counter'];
+    var inProgressColumnCardCount = columnsMap['inProgress-card-counter'];
+    checkColumn(reviewColumn, reviewColumnCardCount, maxReviewTasks);
+    checkColumn(selectedColumn, selectedColumnCardCount, maxSelectedTasks);
+    checkColumn(inProgressColumn, inProgressColumnCardCount, maxInProgressTasks);
 }
 
-function checkColumn(column, maxTasksNumber) {
+function checkColumn(column, columnCardCount, maxTasksNumber) {
     var cards = column.getElementsByClassName('card');
     if(cards.length >= maxTasksNumber) {
         column.classList.add('parent-div-locked');
+        columnCardCount.classList.add('emphasized-card-count');
     } else {
         column.classList.remove('parent-div-locked');
+        columnCardCount.classList.remove('emphasized-card-count');
     }
 }
 
@@ -114,26 +119,32 @@ function getBoardBodyColumns() {
 function getColumnsMap(columnCtList) {
     var columnsMap = {
         'review': null,
+        'review-card-counter': null,
         'selected': null,
-        'inProgress': null
+        'selected-card-counter': null,
+        'inProgress': null,
+        'inProgress-card-counter': null,
     };
 
-    for(var column of columnCtList) {
-        var columnDisplayName = column.getElementsByClassName('column')[0]
+    for(var columnCt of columnCtList) {
+        var columnDisplayName = columnCt.getElementsByClassName('column')[0]
             .getElementsByClassName('column-header')[0]
             .getElementsByClassName('column-text')[0]
             .getElementsByClassName('display-name')[0]
             .innerHTML.toLowerCase();
 
+        var column = columnCt.getElementsByClassName('column')[0];
+        var columnBody = column.getElementsByClassName('column-body')[0];
+        var columnCardCounter = column.getElementsByClassName('column-card-count-total')[0];
         if(columnDisplayName.includes('review')) {
-            columnsMap['review'] = column.getElementsByClassName('column')[0]
-                .getElementsByClassName('column-body')[0];
+            columnsMap['review'] = columnBody;
+            columnsMap['review-card-counter'] = columnCardCounter;
         } else if(columnDisplayName.includes('progress')) {
-            columnsMap['inProgress'] = column.getElementsByClassName('column')[0]
-                .getElementsByClassName('column-body')[0];
+            columnsMap['inProgress'] = columnBody;
+            columnsMap['inProgress-card-counter'] = columnCardCounter;
         } else if(columnDisplayName.includes('selected')) {
-            columnsMap['selected'] = column.getElementsByClassName('column')[0]
-                .getElementsByClassName('column-body')[0];
+            columnsMap['selected'] = columnBody;
+            columnsMap['selected-card-counter'] = columnCardCounter;
         }
     }
 

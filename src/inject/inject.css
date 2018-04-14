@@ -5,3 +5,7 @@
     border: 3px solid red !important;
     border-radius: 5px !important;
 }
+
+.emphasized-card-count {
+    color: red !important;
+}
