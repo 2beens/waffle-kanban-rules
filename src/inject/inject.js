@@ -1,3 +1,5 @@
+'use strict';
+
 var maxReviewTasks;
 var maxInProgressTasks;
 var maxSelectedTasks;
@@ -22,36 +24,24 @@ async function start() {
         //      REVIEW COLUMN OBSERVER
         var reviewColumn = columnsMap['review'];
         var reviewColumnObserver = new MutationObserver(function(mutationsList, observer) {
-            var cards = reviewColumn.getElementsByClassName('card');
-            if(cards.length >= maxReviewTasks) {
-                reviewColumn.classList.add('parent-div-locked');
-            } else {
-                reviewColumn.classList.remove('parent-div-locked');
-            }
+            var reviewColumnCardCount = columnsMap['review-card-counter'];
+            checkColumn(reviewColumn, reviewColumnCardCount, maxReviewTasks);
         });
         reviewColumnObserver.observe(reviewColumn, { attributes: false, childList: true });
 
         //      IN PROGRESS COLUMN OBSERVER
         var inProgressColumn = columnsMap['inProgress'];
         var inProgressColumnObserver = new MutationObserver(function(mutationsList, observer) {
-            var cards = inProgressColumn.getElementsByClassName('card');
-            if(cards.length >= maxInProgressTasks) {
-                inProgressColumn.classList.add('parent-div-locked');
-            } else {
-                inProgressColumn.classList.remove('parent-div-locked');
-            }
+            var inProgressColumnCardCount = columnsMap['inProgress-card-counter'];
+            checkColumn(inProgressColumn, inProgressColumnCardCount, maxInProgressTasks);
         });
         inProgressColumnObserver.observe(inProgressColumn, { attributes: false, childList: true });
 
         //      SELECTED COLUMN OBSERVER
         var selectedColumn = columnsMap['selected'];
         var selectedColumnObserver = new MutationObserver(function(mutationsList, observer) {
-            var cards = selectedColumn.getElementsByClassName('card');
-            if(cards.length >= maxSelectedTasks) {
-                selectedColumn.classList.add('parent-div-locked');
-            } else {
-                selectedColumn.classList.remove('parent-div-locked');
-            }
+            var selectedColumnCardCount = columnsMap['selected-card-counter'];
+            checkColumn(selectedColumn, selectedColumnCardCount, maxSelectedTasks);
         });
         selectedColumnObserver.observe(selectedColumn, { attributes: false, childList: true });
 

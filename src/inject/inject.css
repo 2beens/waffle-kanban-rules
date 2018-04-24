@@ -8,4 +8,5 @@
 
 .emphasized-card-count {
     color: red !important;
+    font-weight: bold !important;
 }
